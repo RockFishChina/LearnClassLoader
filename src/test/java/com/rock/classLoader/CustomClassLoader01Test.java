@@ -2,6 +2,7 @@ package com.rock.classLoader;
 
 
 import com.oracle.util.Checksums;
+import com.rock.ClassDemo;
 import com.sun.org.apache.xpath.internal.axes.AxesWalker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -15,21 +16,47 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public class CustomClassLoader01Test {
 
+
+    /**
+     * StrictMath 是boostrap类加载器加载的。
+     * loadClass的方式，AppClassLoader不是其初始类
+     */
     @Test
-    public void testRewriteFindClass(){
-        CustomClassLoader01 customClassLoader01 = new CustomClassLoader01(ClassLoader.getSystemClassLoader());
+    public void testInitialCL(){
+        Class<?> StrictMath  = null;
         try {
-            Class<?> aClass = customClassLoader01.loadClass("com.rock.ClassDemo");
-            System.out.println(aClass.getClassLoader());
-            //再加载一次，验证一下，初始类加载器的findLoadedClass方法
-            //断点调试，发现 CustomClassLoader01的findLoadedClass返回是null，
-            // 说明CustomClassLoader01 不是 com.rock.ClassDemo 的初始类加载器。
-            Class<?> aClass1 = customClassLoader01.loadClass("com.rock.ClassDemo");
+            System.out.println("start");
+            StrictMath = ClassLoader.getSystemClassLoader().loadClass("java.lang.StrictMath");
+            System.out.println(StrictMath.getClassLoader());
+            StrictMath = ClassLoader.getSystemClassLoader().loadClass("java.lang.StrictMath");
 
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
+
+    /**
+     * trictMath 是boostrap类加载器加载的。
+     * import的方式，AppClassLoader是其初始类
+     */
+    @Test
+    public void testInitialCL1(){
+
+        try {
+            System.out.println("start");
+            ClassDemo classDemo = new ClassDemo();
+            System.out.println("ClassDemo classLoader ：" + ClassDemo.class.getClassLoader());
+            classDemo.getMath();//此方法会触发StrictMath类的加载
+            System.out.println("------");
+            System.out.println(StrictMath.class.getClassLoader());
+            Class<?> strictMathClass = ClassLoader.getSystemClassLoader().loadClass("java.lang.StrictMath");
+            System.out.println(strictMathClass.getClassLoader());
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     //编译后生成的ClassDemo2 移动到 C:\LearnClassLoader\temp\ 目录下，
     @Test
@@ -67,20 +94,5 @@ public class CustomClassLoader01Test {
         }
     }
 
-
-    @Test
-    public void testRewriteFindClassClassDemo4(){
-        CustomClassLoader01 customClassLoader01 = new CustomClassLoader01(ClassLoader.getSystemClassLoader());
-        try {
-            System.out.println("....");
-            Class<?> aClass = Class.forName("java.lang.reflect.GenericSignatureFormatError");
-            System.out.println(aClass.getClassLoader());
-            Class<?> aClass1 = Class.forName("java.lang.reflect.GenericSignatureFormatError");
-            Class<?> aClass2 = customClassLoader01.loadClass("java.lang.reflect.GenericSignatureFormatError");
-
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
 
 }
