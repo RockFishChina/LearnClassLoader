@@ -1,6 +1,8 @@
 package com.rock.classLoader;
 
 
+import com.oracle.util.Checksums;
+import com.sun.org.apache.xpath.internal.axes.AxesWalker;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -22,8 +24,6 @@ public class CustomClassLoader01Test {
             //再加载一次，验证一下，初始类加载器的findLoadedClass方法
             //断点调试，发现 CustomClassLoader01的findLoadedClass返回是null，
             // 说明CustomClassLoader01 不是 com.rock.ClassDemo 的初始类加载器。
-            // 虽然调用了 CustomClassLoader01 的loadClass,但是ClassDemo 已经被加载过了，
-            // 所以现在即使调用了 loadClass也不算是初始类加载器。
             Class<?> aClass1 = customClassLoader01.loadClass("com.rock.ClassDemo");
 
         } catch (ClassNotFoundException e) {
@@ -36,6 +36,7 @@ public class CustomClassLoader01Test {
     public void testRewriteFindClassClassDemo2(){
         CustomClassLoader01 customClassLoader01 = new CustomClassLoader01(ClassLoader.getSystemClassLoader());
         try {
+            System.out.println("....");
             Class<?> aClass = customClassLoader01.loadClass("com.rock.ClassDemo2");
             System.out.println(aClass.getClassLoader());
             //再加载一次，验证一下，初始类加载器的findLoadedClass方法
@@ -49,5 +50,37 @@ public class CustomClassLoader01Test {
         }
     }
 
+    //    java.lang.reflect.GenericSignatureFormatError
+    @Test
+    public void testRewriteFindClassClassDemo3(){
+        CustomClassLoader01 customClassLoader01 = new CustomClassLoader01(ClassLoader.getSystemClassLoader());
+        try {
+            System.out.println("....");
+            Class<?> aClass = customClassLoader01.loadClass("java.lang.reflect.GenericSignatureFormatError");
+            System.out.println(aClass.getClassLoader());
+            //再加载一次，验证一下，初始类加载器的findLoadedClass方法
+            //断点调试，发现 CustomClassLoader01的findLoadedClass返回还是null，为什么?
+            Class<?> aClass1 = customClassLoader01.loadClass("java.lang.reflect.GenericSignatureFormatError");
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void testRewriteFindClassClassDemo4(){
+        CustomClassLoader01 customClassLoader01 = new CustomClassLoader01(ClassLoader.getSystemClassLoader());
+        try {
+            System.out.println("....");
+            Class<?> aClass = Class.forName("java.lang.reflect.GenericSignatureFormatError");
+            System.out.println(aClass.getClassLoader());
+            Class<?> aClass1 = Class.forName("java.lang.reflect.GenericSignatureFormatError");
+            Class<?> aClass2 = customClassLoader01.loadClass("java.lang.reflect.GenericSignatureFormatError");
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
 }
