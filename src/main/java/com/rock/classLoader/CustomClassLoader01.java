@@ -24,8 +24,9 @@ public class CustomClassLoader01 extends ClassLoader {
         ByteArrayOutputStream byteArrayOutputStream = null;
         byte[] bytes = null;
         try {
-            name = name.replace(".","\\");
-            name = "C:\\LearnClassLoader\\temp\\" + name;
+            name = name.replace(".","/");
+            name = "/Users/rockfish/Desktop/temp/"+ name;
+            //name = "C:\\LearnClassLoader\\temp\\" + name;
             inputStream = new FileInputStream(new File(name + ".class"));
             byteArrayOutputStream = new ByteArrayOutputStream();
             int ch = 0;
