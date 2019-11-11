@@ -25,19 +25,20 @@ public class CustomClassLoader01 extends ClassLoader {
             //判断是否已加载
             //指定加载器去加载
             //若还未加载,则调用findClass方法自己去加载
-            System.out.println("start  load class :" + name + "  ; resolve : " + resolve);
+            System.out.println("CustomClassLoader start  load class :" + name + "  ; resolve : " + resolve);
             // First, check if the class has already been loaded
             Class<?> c = findLoadedClass(name);
-            System.out.println("findLoadedClass : " + c);
+            System.out.println("CustomClassLoader findLoadedClass : " + c);
             if (c == null) {
                 try {
                     c = getParent().loadClass(name);
                 } catch (ClassNotFoundException e) {
-                    System.out.println("getParent().loadClass(name) : ClassNotFoundException");
+                    System.out.println("CustomClassLoader getParent().loadClass(name) : ClassNotFoundException");
                     //父加载器加载不到会报错.
                 }
 
                 if (c == null) {
+                    //c = super.findClass(name);
                     c = findClass(name);
                 }
             }
@@ -55,7 +56,7 @@ public class CustomClassLoader01 extends ClassLoader {
     }
 
     private byte[] loadClassData(String name) {
-        System.out.println("loadClassData : " + name);
+        System.out.println("CustomClassLoader loadClassData : " + name);
         InputStream inputStream = null;
         ByteArrayOutputStream byteArrayOutputStream = null;
         byte[] bytes = null;

@@ -38,7 +38,7 @@ public class CustomClassLoader01Test {
 
     /**
      * trictMath 是boostrap类加载器加载的。
-     * import的方式，AppClassLoader是其初始类
+     * import的方式，AppClassLoader是其初始类;那么ExtClassLoader是不是其初始类呢?
      */
     @Test
     public void testInitialCL1(){
@@ -51,6 +51,9 @@ public class CustomClassLoader01Test {
             System.out.println("------");
             System.out.println(StrictMath.class.getClassLoader());
             Class<?> strictMathClass = ClassLoader.getSystemClassLoader().loadClass("java.lang.StrictMath");
+            //调用extClassLoader的loadClass方法看一看,ext的findLoaded是否直接返回,即证明了其是不是初始类加载器.
+            strictMathClass = ClassLoader.getSystemClassLoader().getParent().loadClass("java.lang.StrictMath");
+
             System.out.println(strictMathClass.getClassLoader());
 
         } catch (ClassNotFoundException e) {
